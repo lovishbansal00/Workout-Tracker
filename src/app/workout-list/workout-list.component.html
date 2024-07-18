@@ -1,6 +1,6 @@
 <div class="p-4">
   <h2 class="text-2xl mb-4">User Workout List</h2>
-  <div class="">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <mat-form-field class="w-full mb-4">
       <mat-label>Search by name</mat-label>
       <input
@@ -18,9 +18,9 @@
         (ngModelChange)="onFilterChange()"
       >
         <mat-option value="">All Workout Types</mat-option>
-        <mat-option *ngFor="let type of workoutTypes" [value]="type">{{
-          type
-        }}</mat-option>
+        <mat-option value="Running">Running</mat-option>
+        <mat-option value="Swimming">Swimming</mat-option>
+        <mat-option value="Cycling">Cycling</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
@@ -28,12 +28,17 @@
   <table mat-table [dataSource]="dataSource" class="w-full">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Name</th>
-      <td mat-cell *matCellDef="let userWorkout">{{ userWorkout.name }}</td>
+      <td mat-cell *matCellDef="let userWorkout">
+        <div class="flex items-center cursor-pointer" (click)="toggleChart(userWorkout)">
+          {{ userWorkout.name }}
+          <i class="material-icons ml-2">{{ userWorkout.showChart ? 'expand_less' : 'expand_more' }}</i>
+        </div>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="workouts">
       <th mat-header-cell *matHeaderCellDef>Workout Types</th>
-      <td mat-cell *matCellDef="let userWorkout">{{ userWorkout.workouts }}</td>
+      <td mat-cell *matCellDef="let userWorkout">{{ getWorkoutTypesString(userWorkout.workouts) }}</td>
     </ng-container>
 
     <ng-container matColumnDef="totalWorkouts">
@@ -51,8 +56,15 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    <tr mat-row *matRowDef="let userWorkout; columns: displayedColumns"></tr>
   </table>
+
+  <ng-container *ngFor="let userWorkout of dataSource.filteredData">
+    <div class="overflow-hidden transition-all duration-300 ease-in-out" 
+         [ngClass]="{'max-h-0': !userWorkout.showChart, 'max-h-96': userWorkout.showChart}">
+      <app-workout-chart *ngIf="userWorkout.showChart" [workoutData]="userWorkout.workouts"></app-workout-chart>
+    </div>
+  </ng-container>
 
   <mat-paginator
     [pageSize]="5"

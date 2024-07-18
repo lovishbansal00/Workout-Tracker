@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface Workout {
   type: string;
@@ -12,18 +12,25 @@ export interface User {
   workouts: Workout[];
 }
 
+export interface UserWorkout {
+  name: string;
+  workouts: Workout[];
+  totalWorkouts: number;
+  totalMinutes: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-
   private users: User[] = [];
-  private usersUpdated = new BehaviorSubject<void>(undefined);
+  private userWorkoutsSubject = new BehaviorSubject<UserWorkout[]>([]);
 
-  usersUpdated$ = this.usersUpdated.asObservable();
+  userWorkouts$: Observable<UserWorkout[]> = this.userWorkoutsSubject.asObservable();
 
   constructor() {
     this.loadUsers();
+    this.updateUserWorkouts();
   }
 
   addUserWorkout(name: string, type: string, minutes: number): boolean {
@@ -37,17 +44,18 @@ export class UserService {
     }
     user.workouts.push({ type, minutes });
     this.saveUsers();
-    this.usersUpdated.next();
+    this.updateUserWorkouts();
     return true;
   }
 
-  getUserWorkouts() {
-    return this.users.map(user => ({
+  private updateUserWorkouts() {
+    const userWorkouts = this.users.map(user => ({
       name: user.name,
       workouts: user.workouts,
       totalWorkouts: user.workouts.length,
       totalMinutes: user.workouts.reduce((sum, workout) => sum + workout.minutes, 0)
     }));
+    this.userWorkoutsSubject.next(userWorkouts);
   }
 
   getWorkoutTypes() {
@@ -73,6 +81,7 @@ export class UserService {
       const usersData = localStorage.getItem('users');
       if (usersData) {
         this.users = JSON.parse(usersData);
+        this.updateUserWorkouts();
       }
     } catch (error) {
       console.error('Error loading from localStorage', error);

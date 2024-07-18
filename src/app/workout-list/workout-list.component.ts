@@ -1,65 +1,60 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UserService } from '../user.service';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { UserService, Workout } from '../user.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { Subscription } from 'rxjs';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { FormsModule } from '@angular/forms';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 import { WorkoutChartComponent } from '../workout-chart/workout-chart.component';
-import { Workout } from '../user.service';
+import { Subscription } from 'rxjs';
 
 interface UserWorkout {
   name: string;
-  workouts: string;
+  workouts: Workout[];
   totalWorkouts: number;
   totalMinutes: number;
+  showChart?: boolean;
 }
 
 @Component({
   selector: 'app-workout-list',
   standalone: true,
   imports: [
-    NgFor,
-    NgIf,
-    FormsModule,
-    ReactiveFormsModule,
-    MatTableModule,
+    MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule,
+    MatTableModule,
     MatPaginatorModule,
-    WorkoutChartComponent
+    FormsModule,
+    NgFor,
+    NgIf,
+    WorkoutChartComponent, 
+    NgClass
   ],
   templateUrl: './workout-list.component.html',
   styleUrls: ['./workout-list.component.scss']
 })
-
 export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
-  userWorkouts: UserWorkout[] = [];
-  dataSource = new MatTableDataSource<UserWorkout>([]);
   displayedColumns: string[] = ['name', 'workouts', 'totalWorkouts', 'totalMinutes'];
+  dataSource = new MatTableDataSource<UserWorkout>([]);
+  workoutTypes: string[] = [];
   searchName: string = '';
   filterWorkoutType: string = '';
-  workoutTypes: string[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  private userSubscription: Subscription;
+  private userWorkoutsSubscription: Subscription | undefined;
 
-  constructor(private userService: UserService) {
-    this.userSubscription = new Subscription();
-  }
+  constructor(private userService: UserService) {}
 
   ngOnInit() {
-    this.loadUserWorkouts();
+    this.loadData();
     this.workoutTypes = this.userService.getWorkoutTypes();
-
-    this.userSubscription = this.userService.usersUpdated$.subscribe(() => {
-      this.loadUserWorkouts();
-    });
+    this.setupFilter();
   }
 
   ngAfterViewInit() {
@@ -67,39 +62,28 @@ export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.userSubscription) {
-      this.userSubscription.unsubscribe();
+    if (this.userWorkoutsSubscription) {
+      this.userWorkoutsSubscription.unsubscribe();
     }
   }
 
-  loadUserWorkouts() {
-    const rawData = this.userService.getUserWorkouts();
-    //this.userWorkouts = rawData;
-    this.userWorkouts = rawData.map((user) => ({
-      name: user.name,
-      workouts: this.getWorkoutTypesString(user.workouts),
-      totalWorkouts: user.workouts.length,
-      totalMinutes: this.calculateTotalMinutes(user.workouts)
-    }));
-    this.dataSource.data = this.userWorkouts;
-  }
-
-  private getWorkoutTypesString(workouts: Workout[]): string {
-    if (!workouts || workouts.length === 0) {
-      return 'No workouts';
-    }
-    return workouts.map(w => w.type).join(', ');
-  }
-
-  private calculateTotalMinutes(workouts: Workout[]): number {
-    return workouts.reduce((sum, workout) => sum + workout.minutes, 0);
-  }
-
-  applyFilters() {
-    this.dataSource.data = this.userWorkouts.filter(userWorkout =>
-      userWorkout.name.toLowerCase().includes(this.searchName.toLowerCase()) &&
-      (this.filterWorkoutType === '' || userWorkout.workouts.includes(this.filterWorkoutType))
+  loadData() {
+    this.userWorkoutsSubscription = this.userService.userWorkouts$.subscribe(
+      userWorkouts => {
+        this.dataSource.data = userWorkouts;
+        this.applyFilters();
+      }
     );
+  }
+
+  setupFilter() {
+    this.dataSource.filterPredicate = (data: UserWorkout, filter: string) => {
+      const searchTerms = JSON.parse(filter);
+      const nameMatch = data.name.toLowerCase().indexOf(searchTerms.name) !== -1;
+      const workoutTypeMatch = searchTerms.workoutType === '' || 
+        data.workouts.some(w => w.type === searchTerms.workoutType);
+      return nameMatch && workoutTypeMatch;
+    };
   }
 
   onSearchChange() {
@@ -109,4 +93,32 @@ export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
   onFilterChange() {
     this.applyFilters();
   }
+
+  applyFilters() {
+    const filterValue = JSON.stringify({
+      name: this.searchName.toLowerCase(),
+      workoutType: this.filterWorkoutType
+    });
+    this.dataSource.filter = filterValue;
+  }
+
+  toggleChart(userWorkout: UserWorkout) {
+    userWorkout.showChart = !userWorkout.showChart;
+  }
+
+  getWorkoutTypesString(workouts: { type: string, minutes: number }[]): string {
+    return workouts.map(w => w.type).join(', ');
+  }
+
+
+  createFilter(): (data: UserWorkout, filter: string) => boolean {
+    let filterFunction = function(data: UserWorkout, filter: string): boolean {
+      let searchTerms = JSON.parse(filter);
+      return data.name.toLowerCase().indexOf(searchTerms.name) !== -1
+        && (searchTerms.workoutType === '' || data.workouts.some(w => w.type === searchTerms.workoutType));
+    }
+    return filterFunction;
+  }
+
+  
 }
