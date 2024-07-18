@@ -1,0 +1,63 @@
+<div class="p-4">
+  <h2 class="text-2xl mb-4">User Workout List</h2>
+  <div class="">
+    <mat-form-field class="w-full mb-4">
+      <mat-label>Search by name</mat-label>
+      <input
+        matInput
+        [(ngModel)]="searchName"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Enter name"
+      />
+    </mat-form-field>
+
+    <mat-form-field class="w-full mb-4">
+      <mat-label>Filter by workout type</mat-label>
+      <mat-select
+        [(ngModel)]="filterWorkoutType"
+        (ngModelChange)="onFilterChange()"
+      >
+        <mat-option value="">All Workout Types</mat-option>
+        <mat-option *ngFor="let type of workoutTypes" [value]="type">{{
+          type
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" class="w-full">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let userWorkout">{{ userWorkout.name }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="workouts">
+      <th mat-header-cell *matHeaderCellDef>Workout Types</th>
+      <td mat-cell *matCellDef="let userWorkout">{{ userWorkout.workouts }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalWorkouts">
+      <th mat-header-cell *matHeaderCellDef>No. of Workouts</th>
+      <td mat-cell *matCellDef="let userWorkout">
+        {{ userWorkout.totalWorkouts }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalMinutes">
+      <th mat-header-cell *matHeaderCellDef>Total Minutes</th>
+      <td mat-cell *matCellDef="let userWorkout">
+        {{ userWorkout.totalMinutes }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <mat-paginator
+    [pageSize]="5"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    showFirstLastButtons
+  >
+  </mat-paginator>
+</div>

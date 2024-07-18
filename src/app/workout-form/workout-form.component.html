@@ -1,0 +1,95 @@
+<div class="p-4 max-w-md mx-auto">
+  <form
+    [formGroup]="workoutForm"
+    (ngSubmit)="addUser($event)"
+    class="flex flex-col"
+  >
+    <mat-form-field appearance="fill" class="mb-4 w-2/3 md:w-1/2 md:pr-2">
+      <mat-label>User Name</mat-label>
+      <input matInput type="text" formControlName="username" required />
+      <mat-error
+        *ngIf="
+          workoutForm.get('username')?.invalid &&
+          (workoutForm.get('username')?.dirty ||
+            workoutForm.get('username')?.touched)
+        "
+      >
+        Username is required
+      </mat-error>
+    </mat-form-field>
+    <div class="flex flex-col md:flex-row gap-4">
+      <mat-form-field appearance="fill" class="mb-4 w-2/3 md:w-1/2">
+        <mat-label>Workout Type</mat-label>
+        <mat-select formControlName="workoutType" required>
+          <mat-option value="Running" default>Running</mat-option>
+          <mat-option value="Cycling">Cycling</mat-option>
+          <mat-option value="Swimming">Swimming</mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="
+            workoutForm.get('workoutType')?.invalid &&
+            (workoutForm.get('workoutType')?.dirty ||
+              workoutForm.get('workoutType')?.touched)
+          "
+        >
+          Workout type is required
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="mb-4 w-2/3 md:w-1/2">
+        <mat-label>Minutes</mat-label>
+        <input
+          matInput
+          type="number"
+          formControlName="minutes"
+          min="10"
+          max="90"
+          required
+        />
+        <mat-error
+          *ngIf="
+            workoutForm.get('minutes')?.invalid &&
+            (workoutForm.get('minutes')?.dirty ||
+              workoutForm.get('minutes')?.touched)
+          "
+        >
+          <ng-container
+            *ngIf="workoutForm.get('minutes')?.hasError('required')"
+          >
+            Enter the number of minutes
+          </ng-container>
+          <ng-container *ngIf="workoutForm.get('minutes')?.hasError('min')">
+            Minutes should be at least 10
+          </ng-container>
+          <ng-container *ngIf="workoutForm.get('minutes')?.hasError('max')">
+            Minutes should not be more than 90
+          </ng-container>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div
+      *ngIf="showWarning"
+      class="text-red-500 mb-2 transition-opacity duration-300"
+      [class.opacity-100]="showWarning"
+      [class.opacity-0]="!showWarning"
+    >
+      {{ warningMessage }}
+    </div>
+    <div
+      *ngIf="showSuccess"
+      class="text-green-500 mb-2 transition-opacity duration-300"
+      [class.opacity-100]="showSuccess"
+      [class.opacity-0]="!showSuccess"
+    >
+      {{ successMessage }}
+    </div>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      class="bg-blue-500 text-white mat-small-button w-32 truncate"
+      [disabled]="isButtonDisabled"
+    >
+      Add Workout
+    </button>
+  </form>
+</div>
