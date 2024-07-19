@@ -75,7 +75,7 @@ export class UserService {
     return true;
   }
 
-  private updateUserWorkouts() {
+   updateUserWorkouts() {
     const userWorkouts = this.users.map(user => ({
       name: user.name,
       workouts: user.workouts,
