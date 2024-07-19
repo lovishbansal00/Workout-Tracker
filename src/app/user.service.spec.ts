@@ -26,9 +26,9 @@ describe('UserService', () => {
 
       service.userWorkouts$.subscribe(userWorkouts => {
         console.log('User workouts:', userWorkouts);
-        expect(userWorkouts.length).toBe(1);
-        expect(userWorkouts[0].name).toBe('Lovish');
-        expect(userWorkouts[0].workouts.length).toBe(1);
+        expect(userWorkouts.length).toBe(3);
+        expect(userWorkouts[0].name).toBe('John Doe');
+        expect(userWorkouts[0].workouts.length).toBe(4);
         expect(userWorkouts[0].workouts[0].type).toBe('Running');
         expect(userWorkouts[0].workouts[0].minutes).toBe(30);
       });
@@ -42,8 +42,8 @@ describe('UserService', () => {
       });
       tick();
       service.userWorkouts$.subscribe(userWorkouts => {
-        expect(userWorkouts.length).toBe(1);
-        expect(userWorkouts[0].workouts.length).toBe(2);
+        expect(userWorkouts.length).toBe(4);
+        expect(userWorkouts[3].workouts.length).toBe(1);
       });
     }));
 
@@ -55,7 +55,7 @@ describe('UserService', () => {
       });
       tick();
       service.userWorkouts$.subscribe(userWorkouts => {
-        expect(userWorkouts[0].workouts.length).toBe(1);
+        expect(userWorkouts[0].workouts.length).toBe(2);
       });
     }));
   });
@@ -82,8 +82,8 @@ describe('UserService', () => {
       const storedData = localStorage.getItem('users');
       expect(storedData).toBeTruthy();
       const parsedData = JSON.parse(storedData!);
-      expect(parsedData.length).toBe(1);
-      expect(parsedData[0].name).toBe('Lovish');
+      expect(parsedData.length).toBe(4);
+      expect(parsedData[0].name).toBe('John Doe');
     }));
 
     it('should load users from localStorage', fakeAsync(() => {
@@ -96,8 +96,8 @@ describe('UserService', () => {
       tick();
 
       newService.userWorkouts$.subscribe(userWorkouts => {
-        expect(userWorkouts.length).toBe(1);
-        expect(userWorkouts[0].name).toBe('Lovish');
+        expect(userWorkouts.length).toBe(3);
+        expect(userWorkouts[3].name).toBe('Lovish');
       });
     }));
 

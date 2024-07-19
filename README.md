@@ -14,6 +14,14 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+## Assumptions
+
+1) User Name, Workout Type, Minutes are neccessary fields.
+2) Number of minutes for a workout can only be in range of 10-90.
+3) Workout Type is a drop down with ony 3 values :- Running, Cycling, Swimming.
+4) You can add another same workout type for a user.
+5) You can click the downward arrow at the end of any entry to see the bar graph of the workouts.
+
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
