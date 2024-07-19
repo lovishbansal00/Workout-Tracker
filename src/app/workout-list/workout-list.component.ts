@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { UserService, Workout } from '../user.service';
@@ -32,7 +32,7 @@ interface UserWorkout {
     FormsModule,
     NgFor,
     NgIf,
-    WorkoutChartComponent, 
+    WorkoutChartComponent,
     NgClass
   ],
   templateUrl: './workout-list.component.html',
@@ -49,7 +49,9 @@ export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private userWorkoutsSubscription: Subscription | undefined;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+  ) { }
 
   ngOnInit() {
     this.loadData();
@@ -86,6 +88,16 @@ export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
+  // setupFilter() {
+  //   this.dataSource.filterPredicate = (data: UserWorkout, filter: string) => {
+  //     const searchTerms = JSON.parse(filter);
+  //     const nameMatch = data.name.toLowerCase().includes(searchTerms.name.toLowerCase());
+  //     const workoutTypeMatch = searchTerms.workoutType === '' ||
+  //       data.workouts.some(w => w.type.toLowerCase() === searchTerms.workoutType.toLowerCase());
+  //     return nameMatch && workoutTypeMatch;
+  //   };
+  // }
+
   onSearchChange() {
     this.applyFilters();
   }
@@ -112,7 +124,7 @@ export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   createFilter(): (data: UserWorkout, filter: string) => boolean {
-    let filterFunction = function(data: UserWorkout, filter: string): boolean {
+    let filterFunction = function (data: UserWorkout, filter: string): boolean {
       let searchTerms = JSON.parse(filter);
       return data.name.toLowerCase().indexOf(searchTerms.name) !== -1
         && (searchTerms.workoutType === '' || data.workouts.some(w => w.type === searchTerms.workoutType));
@@ -120,5 +132,4 @@ export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
     return filterFunction;
   }
 
-  
 }
