@@ -36,17 +36,21 @@ export class WorkoutFormComponent {
   });
 
   constructor(private userService: UserService) { }
-
-  addUser(event: Event) {
+  
+ async addUser(event: Event) {
     event.preventDefault();
 
     if (this.workoutForm.valid) {
       const { username, workoutType, minutes } = this.workoutForm.value;
-      const added = this.userService.addUserWorkout(username!, workoutType!, parseInt(minutes!));
+      const added = await this.userService.addUserWorkout(username!, workoutType!, parseInt(minutes!));
 
       if (added) {
         // Workout was successfully added
-        this.workoutForm.reset();
+        this.workoutForm.reset({
+          username: '',
+          workoutType: '',
+          minutes: ''
+        });
         this.showWarning = false;
         this.isButtonDisabled = false;
         this.warningMessage = '';
