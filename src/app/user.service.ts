@@ -33,7 +33,7 @@ export class UserService {
     this.updateUserWorkouts();
   }
 
-  addUserWorkout(name: string, type: string, minutes: number): boolean {
+  async addUserWorkout(name: string, type: string, minutes: number): Promise<boolean> {
     let user = this.users.find(user => user.name === name);
     if (!user) {
       user = { id: this.users.length + 1, name, workouts: [] };
