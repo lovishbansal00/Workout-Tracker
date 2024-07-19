@@ -19,6 +19,33 @@ export interface UserWorkout {
   totalMinutes: number;
 }
 
+const userData: User[] = [
+  {
+    id: 1,
+    name: 'John Doe',
+    workouts: [
+      { type: 'Running', minutes: 30 },
+      { type: 'Cycling', minutes: 45 }
+    ]
+  },
+  {
+    id: 2,
+    name: 'Jane Smith',
+    workouts: [
+      { type: 'Swimming', minutes: 60 },
+      { type: 'Running', minutes: 20 }
+    ]
+  },
+  {
+    id: 3,
+    name: 'Mike Johnson',
+    workouts: [
+      { type: 'Swimming', minutes: 50 },
+      { type: 'Cycling', minutes: 40 }
+    ]
+  },
+]
+
 @Injectable({
   providedIn: 'root'
 })
@@ -81,8 +108,11 @@ export class UserService {
       const usersData = localStorage.getItem('users');
       if (usersData) {
         this.users = JSON.parse(usersData);
-        this.updateUserWorkouts();
+      } else {
+        localStorage.setItem('users', JSON.stringify(userData))
+        this.users = userData
       }
+      this.updateUserWorkouts();
     } catch (error) {
       console.error('Error loading from localStorage', error);
     }

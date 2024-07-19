@@ -88,16 +88,6 @@ export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  // setupFilter() {
-  //   this.dataSource.filterPredicate = (data: UserWorkout, filter: string) => {
-  //     const searchTerms = JSON.parse(filter);
-  //     const nameMatch = data.name.toLowerCase().includes(searchTerms.name.toLowerCase());
-  //     const workoutTypeMatch = searchTerms.workoutType === '' ||
-  //       data.workouts.some(w => w.type.toLowerCase() === searchTerms.workoutType.toLowerCase());
-  //     return nameMatch && workoutTypeMatch;
-  //   };
-  // }
-
   onSearchChange() {
     this.applyFilters();
   }
