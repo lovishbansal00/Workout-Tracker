@@ -29,10 +29,7 @@
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Name</th>
       <td mat-cell *matCellDef="let userWorkout">
-        <div class="flex items-center cursor-pointer" (click)="toggleChart(userWorkout)">
-          {{ userWorkout.name }}
-          <i class="material-icons ml-2">{{ userWorkout.showChart ? 'expand_less' : 'expand_more' }}</i>
-        </div>
+        {{ userWorkout.name }}
       </td>
     </ng-container>
 
@@ -55,6 +52,15 @@
       </td>
     </ng-container>
 
+    <ng-container matColumnDef="expand">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let userWorkout">
+        <div class="flex items-center justify-end cursor-pointer" (click)="toggleChart(userWorkout)">
+          <i class="material-icons">{{ userWorkout.showChart ? 'expand_less' : 'expand_more' }}</i>
+        </div>
+      </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let userWorkout; columns: displayedColumns"></tr>
   </table>
@@ -62,7 +68,9 @@
   <ng-container *ngFor="let userWorkout of dataSource.filteredData">
     <div class="overflow-hidden transition-all duration-300 ease-in-out" 
          [ngClass]="{'max-h-0': !userWorkout.showChart, 'max-h-96': userWorkout.showChart}">
-      <app-workout-chart *ngIf="userWorkout.showChart" [workoutData]="userWorkout.workouts"></app-workout-chart>
+      <div *ngIf="userWorkout.showChart" style="height: 300px;">
+        <app-workout-chart [workoutData]="userWorkout.workouts"></app-workout-chart>
+      </div>
     </div>
   </ng-container>
 

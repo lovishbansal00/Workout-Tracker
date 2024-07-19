@@ -6,14 +6,12 @@ import { NgIf } from '@angular/common';
   selector: 'app-workout-chart',
   standalone: true,
   imports: [ChartModule, NgIf],
-  template:
-    `
-    <div *ngIf="chartData" class="p-4">
+  template: `
+    <div *ngIf="chartData">
       <p-chart type="bar" [data]="chartData" [options]="chartOptions"></p-chart>
     </div>
   `
 })
-
 export class WorkoutChartComponent implements OnChanges {
   @Input() workoutData: { type: string, minutes: number }[] = [];
 
@@ -41,9 +39,11 @@ export class WorkoutChartComponent implements OnChanges {
 
     this.chartOptions = {
       responsive: true,
+      maintainAspectRatio: false,
       scales: {
         y: {
           beginAtZero: true,
+          min: 0,
           max: 90,
           ticks: {
             stepSize: 10

@@ -39,7 +39,7 @@ interface UserWorkout {
   styleUrls: ['./workout-list.component.scss']
 })
 export class WorkoutListComponent implements OnInit, AfterViewInit, OnDestroy {
-  displayedColumns: string[] = ['name', 'workouts', 'totalWorkouts', 'totalMinutes'];
+  displayedColumns: string[] = ['name', 'workouts', 'totalWorkouts', 'totalMinutes', 'expand'];
   dataSource = new MatTableDataSource<UserWorkout>([]);
   workoutTypes: string[] = [];
   searchName: string = '';
